@@ -5,6 +5,19 @@ class User < ApplicationRecord
          :recoverable, :rememberable, :validatable
          
   attachment :profile_image, destroy: false
+  
+  include JpPrefecture
+  jp_prefecture :prefecture_code  
+  # prefecture_codeはuserが持っているカラム
+  
+  # // postal_codeからprefecture_nameに変換するメソッドを用意します．
+  def prefecture_name
+    JpPrefecture::Prefecture.find(code: prefecture_code).try(:name)
+  end
+  
+  def prefecture_name=(prefecture_name)
+    self.prefecture_code = JpPrefecture::Prefecture.find(name: prefecture_name).code
+  end
 
   has_many :books, dependent: :destroy
   has_many :favorites, dependent: :destroy
